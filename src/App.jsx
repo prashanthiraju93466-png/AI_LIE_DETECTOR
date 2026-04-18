@@ -37,29 +37,32 @@ function App() {
 
       mediaRecorder.ondataavailable = async (event) => {
         if (event.data && event.data.size > 0) {
-          // Send media chunk to Python FastAPI backend
-          const formData = new FormData();
-          formData.append('video', event.data, 'chunk.webm');
+          // --- MOCK DATA SIMULATION (PORTFOLIO MODE) ---
+          const mockScore = Math.random() * 100;
+          const mockConfidence = Math.floor(Math.random() * 20) + 80; // 80-100%
           
-          try {
-             // Calling the backend AI pipeline
-             const res = await fetch('http://localhost:8000/analyze', {
-                 method: 'POST',
-                 body: formData
-             });
-             const data = await res.json();
-             if(data.status === 'success') {
-                setScore(data.deception_score);
-                setConfidence(data.ai_confidence);
-                setExpressions(prev => {
-                  const arr = [...data.expressions, ...prev].slice(0, 5);
-                  return arr;
-                });
-                setAudioMetrics(data.audio_metrics);
-             }
-          } catch(err) {
-             console.error("Backend processing unreachable. Make sure FastAPI is running on port 8000.", err);
-          }
+          const mockExpList = [
+            'Micro-tension detected in upper lip', 
+            'Baseline parameters matched', 
+            'Eye blink rate increased', 
+            'Smile asymmetry logged',
+            'Vocal pitch irregularity',
+            'Neutral expression maintained'
+          ];
+          const newExp = mockExpList[Math.floor(Math.random() * mockExpList.length)];
+          
+          setScore(mockScore);
+          setConfidence(mockConfidence);
+          setExpressions(prev => {
+            const arr = [newExp, ...prev].slice(0, 5);
+            return arr;
+          });
+          
+          setAudioMetrics({
+            pitch: Math.floor(Math.random() * 50 + 150) + 'Hz',
+            jitter: (Math.random() * 2.5).toFixed(2) + '%',
+            shimmer: (Math.random() * 5 + 1).toFixed(2) + '%'
+          });
         }
       };
 
